@@ -28,10 +28,10 @@ metadata:
     app: jenkins
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
-      storage: 30Gi
+      storage: 10Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -56,7 +56,7 @@ spec:
           claimName: jenkins-pv-claim
       containers:
       - name: jenkins
-        image: <your-docker-registry>/jenkins-master:0.0.1
+        image: mfarhan1998/jenkins-master:centos
         env:
         - name: JAVA_OPTS
           value: -Djenkins.install.runSetupWizard=false
@@ -69,8 +69,6 @@ spec:
           name: jenkins-pv-storage
         securityContext:
           privileged: true
-      imagePullSecrets:
-      - name: regcred
       initContainers:
       - name: volume-mount-data-log
         image: busybox
@@ -90,6 +88,8 @@ spec:
   ports:
   - port: 8080
     targetPort: 8080
+    type: NodePort
+    nodePort: 30008
     protocol: TCP
     name: app
   - port: 50000
